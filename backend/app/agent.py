@@ -7,13 +7,15 @@ from app.config import settings
 from app.tools import calendar as calendar_tools
 from app.tools import drive as drive_tools
 from app.tools import email as email_tools
+from app.tools import notion as notion_tools
 from app.tools.search import search_web
 from app.tools.weather import get_weather
 
 SYSTEM_PROMPT = (
     "You are a personal AI assistant. Use the available tools when you need "
     "current information such as web search results, weather, the user's "
-    "Google Calendar, the user's Google Drive files, or sending email. Be concise and accurate.\n\n"
+    "Google Calendar, the user's Google Drive files, the user's Notion workspace, or sending email. "
+    "Be concise and accurate.\n\n"
     "Email rule: never send an email on your own initiative. First call send_email with confirmed=False "
     "to get a summary. Show the user the recipient, the subject and the body preview, and ask for explicit "
     "confirmation. Only call send_email with confirmed=True after the user clearly approves that exact "
@@ -119,3 +121,37 @@ async def send_email(
         confirmed: Set to True only after explicit user approval.
     """
     return email_tools.send_email(to=to, subject=subject, body=body, confirmed=confirmed)
+
+
+@agent.tool
+async def search_notion(ctx: RunContext[None], query: str, max_results: int = 5) -> str:
+    """Search the user's Notion workspace for pages and databases by title.
+
+    Args:
+        ctx: The run context.
+        query: Text to search for in page and database titles.
+        max_results: Maximum number of results to return.
+    """
+    return await notion_tools.search_notion(query=query, max_results=max_results)
+
+
+@agent.tool
+async def create_notion_page(
+    ctx: RunContext[None],
+    parent_page_id: str,
+    title: str,
+    content: str = "",
+) -> str:
+    """Create a new child page in Notion under a parent page.
+
+    Args:
+        ctx: The run context.
+        parent_page_id: The ID of the parent Notion page, as returned by search_notion.
+        title: Title of the new page.
+        content: Text content; each line becomes a paragraph block.
+    """
+    return await notion_tools.create_notion_page(
+        parent_page_id=parent_page_id,
+        title=title,
+        content=content,
+    )
