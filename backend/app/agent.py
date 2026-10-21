@@ -6,13 +6,18 @@ from pydantic_ai.providers.openai import OpenAIProvider
 from app.config import settings
 from app.tools import calendar as calendar_tools
 from app.tools import drive as drive_tools
+from app.tools import email as email_tools
 from app.tools.search import search_web
 from app.tools.weather import get_weather
 
 SYSTEM_PROMPT = (
     "You are a personal AI assistant. Use the available tools when you need "
     "current information such as web search results, weather, the user's "
-    "Google Calendar, or the user's Google Drive files. Be concise and accurate."
+    "Google Calendar, the user's Google Drive files, or sending email. Be concise and accurate.\n\n"
+    "Email rule: never send an email on your own initiative. First call send_email with confirmed=False "
+    "to get a summary. Show the user the recipient, the subject and the body preview, and ask for explicit "
+    "confirmation. Only call send_email with confirmed=True after the user clearly approves that exact "
+    "version. If the user changes anything, prepare a new summary and ask again."
 )
 
 
@@ -91,3 +96,26 @@ async def read_drive_file(ctx: RunContext[None], file_id: str) -> str:
         file_id: The Drive file ID, as returned by search_drive_files.
     """
     return drive_tools.read_drive_file(file_id=file_id)
+
+
+@agent.tool
+async def send_email(
+    ctx: RunContext[None],
+    to: str,
+    subject: str,
+    body: str,
+    confirmed: bool = False,
+) -> str:
+    """Send an email via SMTP. Requires explicit user confirmation.
+
+    Call with confirmed=False first to get a summary for the user. Only use confirmed=True
+    after the user has explicitly approved that exact recipient, subject and body.
+
+    Args:
+        ctx: The run context.
+        to: Recipient email address.
+        subject: Email subject.
+        body: Plain text email body.
+        confirmed: Set to True only after explicit user approval.
+    """
+    return email_tools.send_email(to=to, subject=subject, body=body, confirmed=confirmed)
