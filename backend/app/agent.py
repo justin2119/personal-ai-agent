@@ -5,13 +5,14 @@ from pydantic_ai.providers.openai import OpenAIProvider
 
 from app.config import settings
 from app.tools import calendar as calendar_tools
+from app.tools import drive as drive_tools
 from app.tools.search import search_web
 from app.tools.weather import get_weather
 
 SYSTEM_PROMPT = (
     "You are a personal AI assistant. Use the available tools when you need "
-    "current information such as web search results, weather, or the user's "
-    "Google Calendar. Be concise and accurate."
+    "current information such as web search results, weather, the user's "
+    "Google Calendar, or the user's Google Drive files. Be concise and accurate."
 )
 
 
@@ -67,3 +68,26 @@ async def create_calendar_event(
         end_time=end_time,
         description=description,
     )
+
+
+@agent.tool
+async def search_drive_files(ctx: RunContext[None], query: str, max_results: int = 10) -> str:
+    """Search the user's Google Drive files by name or full text content.
+
+    Args:
+        ctx: The run context.
+        query: Text to search for in file names and contents.
+        max_results: Maximum number of files to return.
+    """
+    return drive_tools.search_drive_files(query=query, max_results=max_results)
+
+
+@agent.tool
+async def read_drive_file(ctx: RunContext[None], file_id: str) -> str:
+    """Read the text content of a Google Drive file (Google Docs and text files).
+
+    Args:
+        ctx: The run context.
+        file_id: The Drive file ID, as returned by search_drive_files.
+    """
+    return drive_tools.read_drive_file(file_id=file_id)
