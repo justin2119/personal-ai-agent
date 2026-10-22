@@ -1,0 +1,19 @@
+[build]
+  # The frontend is static HTML/CSS/JS, so no build step is required.
+  base = "frontend"
+  publish = "."
+  command = "echo 'Static frontend, no build step'"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+# Optional: to call the backend through the same origin (no CORS), uncomment and set your backend URL.
+# [[redirects]]
+#   from = "/api/*"
+#   to = "https://YOUR-BACKEND-URL/api/:splat"
+#   status = 200
+#   force = true
