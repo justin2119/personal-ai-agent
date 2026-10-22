@@ -31,6 +31,16 @@ body {
   background: var(--bg);
 }
 
+/* Icons (Lucide, replaced by inline SVG) */
+
+svg.lucide {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  stroke-width: 2;
+  vertical-align: middle;
+}
+
 .app {
   position: relative;
   display: flex;
@@ -67,7 +77,6 @@ body {
 
 .new-chat {
   width: 100%;
-  text-align: center;
 }
 
 .sidebar-title {
@@ -151,8 +160,8 @@ body {
 }
 
 .session-action {
-  width: 24px;
-  height: 24px;
+  width: 26px;
+  height: 26px;
   padding: 0;
   display: inline-flex;
   align-items: center;
@@ -161,8 +170,13 @@ body {
   border: 1px solid transparent;
   border-radius: var(--radius-sm);
   color: var(--muted);
-  font-size: 0.85rem;
   line-height: 1;
+}
+
+.session-action svg {
+  width: 15px;
+  height: 15px;
+  stroke-width: 2;
 }
 
 .session-action:hover {
@@ -207,11 +221,23 @@ body {
   margin: 0;
 }
 
-.brand-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: var(--radius-full);
+/* Brand mark: square tile, Style Carré (rounded-md) */
+.brand-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
   background: var(--primary);
+  color: #ffffff;
+  border-radius: var(--radius-md);
+}
+
+.brand-mark svg {
+  width: 18px;
+  height: 18px;
+  stroke-width: 2;
 }
 
 .settings {
@@ -265,9 +291,13 @@ button {
   cursor: pointer;
 }
 
-/* rounded-full is reserved for primary action buttons */
+/* Primary action buttons: pill shape (rounded-full) is reserved for these and active elements */
 .btn-primary,
 .btn-send {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   background: var(--primary);
   color: #ffffff;
   border: none;
@@ -275,7 +305,16 @@ button {
   padding: 10px 18px;
   font-weight: 600;
   font-size: 0.9rem;
+  line-height: 1;
+  white-space: nowrap;
   transition: background 0.15s ease;
+}
+
+.btn-primary svg,
+.btn-send svg {
+  width: 16px;
+  height: 16px;
+  stroke-width: 2.2;
 }
 
 .btn-primary:hover,
@@ -289,7 +328,11 @@ button {
   cursor: not-allowed;
 }
 
+/* Secondary buttons: square style (rounded-sm) */
 .btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   background: transparent;
   color: var(--primary);
   border: 1px solid var(--border);
@@ -297,6 +340,13 @@ button {
   padding: 8px 14px;
   font-size: 0.85rem;
   font-weight: 600;
+  line-height: 1;
+}
+
+.btn-ghost svg {
+  width: 16px;
+  height: 16px;
+  stroke-width: 2;
 }
 
 .btn-ghost:hover {
@@ -350,6 +400,24 @@ textarea:focus {
   max-width: 460px;
 }
 
+.empty-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  margin-bottom: 14px;
+  background: #e6f0fb;
+  color: var(--primary);
+  border-radius: var(--radius-md);
+}
+
+.empty-icon svg {
+  width: 28px;
+  height: 28px;
+  stroke-width: 1.8;
+}
+
 .empty-state h2 {
   color: var(--text);
   font-size: 1.3rem;
@@ -392,7 +460,9 @@ textarea:focus {
 }
 
 .message-label {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 6px;
   font-size: 0.72rem;
   font-weight: 600;
   text-transform: uppercase;
@@ -401,8 +471,18 @@ textarea:focus {
   margin-bottom: 4px;
 }
 
+.message-label svg {
+  width: 13px;
+  height: 13px;
+  stroke-width: 2.2;
+}
+
 .message.user .message-label {
   color: rgba(255, 255, 255, 0.8);
+}
+
+.message.error .message-label {
+  color: var(--error);
 }
 
 /* Thinking / tool activity indicator */
@@ -410,19 +490,33 @@ textarea:focus {
 .thinking {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   color: var(--muted);
   font-size: 0.9rem;
 }
 
 .tool-badge {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   font-size: 0.75rem;
   font-weight: 600;
+  line-height: 1;
   color: var(--primary);
   background: #e6f0fb;
   border-radius: var(--radius-sm);
-  padding: 2px 10px;
+  padding: 5px 10px;
+}
+
+.tool-badge svg {
+  width: 13px;
+  height: 13px;
+  stroke-width: 2.2;
+}
+
+.dots {
+  display: inline-flex;
+  align-items: center;
 }
 
 .dots span {
@@ -514,7 +608,7 @@ textarea:focus {
   }
 
   .sidebar-toggle {
-    display: inline-block;
+    display: inline-flex;
   }
 
   .topbar {
