@@ -37,8 +37,9 @@ def build_model() -> OpenAIModel:
         api_key=settings.RODIUM_API_KEY,
         base_url=settings.RODIUM_BASE_URL,
     )
+    model_name = settings.RODIUM_MODEL or "gpt-4o-mini"
     return OpenAIModel(
-        model_name="default",
+        model_name=model_name,
         provider=OpenAIProvider(openai_client=client),
     )
 
