@@ -392,6 +392,16 @@
     if (!session) return;
     var sessionId = session.id;
 
+    // Prior conversation turns (user and agent only, errors excluded), sent so the
+    // agent keeps context such as a pending draft across messages.
+    var history = session.messages
+      .filter(function (m) {
+        return m.role === "user" || m.role === "agent";
+      })
+      .map(function (m) {
+        return { role: m.role === "agent" ? "assistant" : "user", content: m.text };
+      });
+
     var isFirstUserMessage = !session.messages.some(function (m) {
       return m.role === "user";
     });
@@ -418,7 +428,7 @@
     fetch(baseUrl + CHAT_PATH, {
       method: "POST",
       headers: { "Content-Type": "application/json", "Accept": "application/json" },
-      body: JSON.stringify({ message: text }),
+      body: JSON.stringify({ message: text, session_id: sessionId, history: history }),
       signal: controller ? controller.signal : undefined
     })
       .then(function (response) {
