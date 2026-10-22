@@ -8,37 +8,48 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="app">
-    <header class="topbar">
-      <div class="brand">
-        <span class="brand-dot" aria-hidden="true"></span>
-        <h1>Personal AI Agent</h1>
+  <div class="app" id="app">
+    <aside id="sidebar" class="sidebar" aria-label="Historique des discussions">
+      <div class="sidebar-head">
+        <button id="new-chat" class="btn-new" type="button">+ Nouvelle discussion</button>
       </div>
-      <details class="settings">
-        <summary class="btn-ghost">Configuration</summary>
-        <div class="settings-panel">
-          <label for="backend-url">URL du backend</label>
-          <div class="settings-row">
-            <input id="backend-url" type="url" placeholder="https://votre-backend.exemple.com" autocomplete="off" />
-            <button id="save-url" class="btn-primary" type="button">Enregistrer</button>
-          </div>
-          <p class="hint">Cette adresse est mémorisée dans ce navigateur.</p>
+      <p class="sidebar-title">Historique</p>
+      <ul id="session-list" class="session-list"></ul>
+    </aside>
+
+    <div class="main">
+      <header class="topbar">
+        <div class="brand">
+          <button id="toggle-sidebar" class="btn-ghost btn-icon" type="button" aria-controls="sidebar" aria-expanded="true" aria-label="Afficher ou masquer l'historique">&#9776;</button>
+          <span class="brand-dot" aria-hidden="true"></span>
+          <h1>Personal AI Agent</h1>
         </div>
-      </details>
-    </header>
+        <details class="settings">
+          <summary class="btn-ghost">Configuration</summary>
+          <div class="settings-panel">
+            <label for="backend-url">URL du backend</label>
+            <div class="settings-row">
+              <input id="backend-url" type="url" placeholder="https://votre-backend.exemple.com" autocomplete="off" />
+              <button id="save-url" class="btn-primary" type="button">Enregistrer</button>
+            </div>
+            <p class="hint">Cette adresse est mémorisée dans ce navigateur.</p>
+          </div>
+        </details>
+      </header>
 
-    <main id="chat" class="chat" aria-live="polite">
-      <div class="empty-state" id="empty-state">
-        <h2>Comment puis-je vous aider ?</h2>
-        <p>Posez une question, demandez la météo, consultez votre agenda, vos fichiers Drive ou votre espace Notion.</p>
-      </div>
-    </main>
+      <main id="chat" class="chat" aria-live="polite">
+        <div class="empty-state" id="empty-state">
+          <h2>Comment puis-je vous aider ?</h2>
+          <p>Posez une question, demandez la météo, consultez votre agenda, vos fichiers Drive ou votre espace Notion.</p>
+        </div>
+      </main>
 
-    <form id="composer" class="composer" autocomplete="off">
-      <textarea id="message" rows="1" placeholder="Écrivez votre message..." aria-label="Message"></textarea>
-      <button id="send" class="btn-send" type="submit">Envoyer</button>
-    </form>
-    <p id="status" class="status" role="status"></p>
+      <form id="composer" class="composer" autocomplete="off">
+        <textarea id="message" rows="1" placeholder="Écrivez votre message..." aria-label="Message"></textarea>
+        <button id="send" class="btn-send" type="submit">Envoyer</button>
+      </form>
+      <p id="status" class="status" role="status"></p>
+    </div>
   </div>
 
   <script src="app.js"></script>
