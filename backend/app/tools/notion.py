@@ -1,6 +1,11 @@
+import functools
+import logging
+
 import httpx
 
 from app.config import settings
+
+logger = logging.getLogger(__name__)
 
 NOTION_API_URL = "https://api.notion.com/v1"
 NOTION_VERSION = "2022-06-28"
@@ -16,6 +21,28 @@ def _headers() -> dict:
         "Notion-Version": NOTION_VERSION,
         "Content-Type": "application/json",
     }
+
+
+def _safe_async_tool(func):
+    """Convert any exception raised by an async Notion tool into a readable error string."""
+
+    @functools.wraps(func)
+    async def wrapper(*args, **kwargs):
+        try:
+            return await func(*args, **kwargs)
+        except RuntimeError as exc:
+            return f"Erreur Notion : {exc}"
+        except httpx.HTTPStatusError as exc:
+            logger.warning("Notion API error in %s: HTTP %s", func.__name__, exc.response.status_code)
+            return f"Erreur Notion : l'API a renvoyé une erreur (HTTP {exc.response.status_code})."
+        except httpx.HTTPError as exc:
+            logger.warning("Notion request failed in %s: %s", func.__name__, type(exc).__name__)
+            return f"Erreur Notion : connexion impossible ({type(exc).__name__})."
+        except Exception as exc:
+            logger.exception("Unexpected error in %s", func.__name__)
+            return f"Erreur Notion inattendue dans {func.__name__} : {type(exc).__name__}."
+
+    return wrapper
 
 
 def _title_of(item: dict) -> str:
@@ -50,6 +77,7 @@ def _paragraph_blocks(content: str) -> list[dict]:
     return blocks
 
 
+@_safe_async_tool
 async def search_notion(query: str, max_results: int = 5) -> str:
     """Search the Notion workspace for pages and databases by title."""
     payload = {"query": query, "page_size": max(1, min(max_results, 100))}
@@ -66,6 +94,7 @@ async def search_notion(query: str, max_results: int = 5) -> str:
     return "\n".join(lines)
 
 
+@_safe_async_tool
 async def create_notion_page(parent_page_id: str, title: str, content: str = "") -> str:
     """Create a child page under a parent Notion page, with a title and paragraph content."""
     payload = {
