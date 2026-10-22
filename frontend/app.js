@@ -4,8 +4,9 @@
   // Backend URL resolution order:
   // 1. value saved in this browser (localStorage, set from the settings panel)
   // 2. window.BACKEND_URL defined in a config script (optional, e.g. config.js)
-  // 3. empty: the user must set it in the settings panel
+  // 3. default: http://127.0.0.1:8000
   var STORAGE_KEY = "personal-ai-agent.backendUrl";
+  var DEFAULT_BACKEND_URL = "http://127.0.0.1:8000";
   var CHAT_PATH = "/api/chat";
   var REQUEST_TIMEOUT_MS = 120000;
 
@@ -22,7 +23,7 @@
 
   function getBackendUrl() {
     var saved = window.localStorage.getItem(STORAGE_KEY);
-    var url = saved || window.BACKEND_URL || "";
+    var url = saved || window.BACKEND_URL || DEFAULT_BACKEND_URL;
     return url.replace(/\/+$/, "");
   }
 
