@@ -18,6 +18,9 @@ from app.tools.search import search_web
 from app.tools.weather import get_weather
 
 SYSTEM_PROMPT = (
+    "Language rule: always speak and respond to the user in French. Every reply, summary, "
+    "confirmation and question must be written in French, even if the user writes in another "
+    "language, unless the user explicitly asks you to switch languages.\n\n"
     "You are a personal AI assistant. Use the available tools when you need "
     "current information such as web search results, weather, the user's "
     "Google Calendar, the user's Google Drive files, the user's Notion workspace, or sending email. "
