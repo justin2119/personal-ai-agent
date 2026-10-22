@@ -9,20 +9,20 @@
 </head>
 <body>
   <div class="app" id="app">
-    <aside id="sidebar" class="sidebar" aria-label="Historique des discussions">
-      <div class="sidebar-head">
-        <button id="new-chat" class="btn-new" type="button">+ Nouvelle discussion</button>
-      </div>
+    <aside class="sidebar" id="sidebar" aria-label="Historique des discussions">
+      <button id="new-chat" class="btn-primary new-chat" type="button">Nouvelle discussion</button>
       <p class="sidebar-title">Historique</p>
       <ul id="session-list" class="session-list"></ul>
     </aside>
 
     <div class="main">
       <header class="topbar">
-        <div class="brand">
-          <button id="toggle-sidebar" class="btn-ghost btn-icon" type="button" aria-controls="sidebar" aria-expanded="true" aria-label="Afficher ou masquer l'historique">&#9776;</button>
-          <span class="brand-dot" aria-hidden="true"></span>
-          <h1>Personal AI Agent</h1>
+        <div class="topbar-left">
+          <button id="sidebar-toggle" class="btn-ghost sidebar-toggle" type="button" aria-expanded="false" aria-controls="sidebar">Historique</button>
+          <div class="brand">
+            <span class="brand-dot" aria-hidden="true"></span>
+            <h1>Personal AI Agent</h1>
+          </div>
         </div>
         <details class="settings">
           <summary class="btn-ghost">Configuration</summary>
