@@ -1,7 +1,13 @@
 from openai import AsyncOpenAI
 from pydantic_ai import Agent, RunContext
-from pydantic_ai.models.openai import OpenAIModel
 from pydantic_ai.providers.openai import OpenAIProvider
+
+try:
+    # Recent pydantic-ai versions
+    from pydantic_ai.models.openai import OpenAIChatModel as OpenAIModel
+except ImportError:
+    # Older pydantic-ai versions
+    from pydantic_ai.models.openai import OpenAIModel
 
 from app.config import settings
 from app.tools import calendar as calendar_tools
