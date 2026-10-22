@@ -1,0 +1,29 @@
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+token.json
+credentials.json
+
+# Python caches and virtual environments
+__pycache__/
+*.py[cod]
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+venv/
+.venv/
+env/
+*.egg-info/
+
+# Local test scripts and editor/OS files
+test_agent.py
+.vscode/
+.idea/
+.DS_Store
+
+# Not needed inside the image
+Dockerfile
+.dockerignore
+Procfile

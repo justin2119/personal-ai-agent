@@ -1,0 +1,33 @@
+services:
+  - type: web
+    name: personal-ai-agent-backend
+    runtime: docker
+    plan: free
+    rootDir: backend
+    dockerfilePath: ./Dockerfile
+    dockerContext: ./backend
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: RODIUM_API_KEY
+        sync: false
+      - key: RODIUM_BASE_URL
+        value: https://api.rodiumai.io/v1
+      - key: TAVILY_API_KEY
+        sync: false
+      - key: WEATHER_API_KEY
+        sync: false
+      - key: NOTION_API_KEY
+        sync: false
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_PORT
+        value: "587"
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASSWORD
+        sync: false
+      - key: GOOGLE_TOKEN_FILE
+        value: token.json
+      - key: GOOGLE_CALENDAR_ID
+        value: primary
