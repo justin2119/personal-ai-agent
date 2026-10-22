@@ -8,77 +8,69 @@ Type a question and press Enter. Type 'exit', 'quit' or press Ctrl+C to stop.
 
 import asyncio
 import os
-import sys
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from dotenv import load_dotenv
+from pydantic_ai.messages import ModelMessage, ModelRequest, ModelResponse, ToolCallPart, ToolReturnPart
 
-try:
-    from dotenv import load_dotenv
+from app.agent import agent
 
-    load_dotenv()
-except ImportError:
-    print("Missing dependency: python-dotenv. Run: pip install -r requirements.txt")
-    sys.exit(1)
+load_dotenv()
 
 EXIT_WORDS = {"exit", "quit", "q"}
+
+# Names of the tools registered on the agent in app/agent.py.
+# Kept explicit so the script only relies on the public API of PydanticAI.
+CONFIGURED_TOOLS = (
+    "search_web",
+    "get_weather",
+    "list_calendar_events",
+    "create_calendar_event",
+    "search_drive_files",
+    "read_drive_file",
+    "send_email",
+    "search_notion",
+    "create_notion_page",
+)
+
+PREVIEW_LIMIT = 300
 
 
 def check_environment() -> None:
     """Fail early with a clear message if the LLM key is missing."""
     if not os.getenv("RODIUM_API_KEY"):
         print("Error: RODIUM_API_KEY is not set. Add it to backend/.env (see .env.example).")
-        sys.exit(1)
+        raise SystemExit(1)
 
 
-def load_agent():
-    try:
-        from app.agent import agent
-    except ImportError as exc:
-        print(f"Error: missing dependency or module ({exc}). Run: pip install -r requirements.txt")
-        sys.exit(1)
-    except Exception as exc:
-        print(f"Error while initialising the agent: {type(exc).__name__}: {exc}")
-        sys.exit(1)
-    return agent
-
-
-def list_configured_tools(agent) -> None:
-    """Print the tools registered on the agent, using the toolset internals of PydanticAI."""
+def list_configured_tools() -> None:
+    """Print the names of the tools configured on the agent."""
     print("Configured tools:")
-    names = []
-    try:
-        # Function tools registered with @agent.tool or passed as tools=[...]
-        for name in agent._function_toolset.tools.keys():  # type: ignore[attr-defined]
-            names.append(name)
-    except AttributeError:
-        names = []
-    if not names:
-        print("  (could not read the tool list from this PydanticAI version)")
-        return
-    for name in sorted(names):
+    for name in sorted(CONFIGURED_TOOLS):
         print(f"  - {name}")
 
 
-def describe_tool_calls(messages) -> None:
+def _preview(value: object) -> str:
+    text = str(value)
+    if len(text) > PREVIEW_LIMIT:
+        return text[:PREVIEW_LIMIT] + "..."
+    return text
+
+
+def describe_tool_calls(messages: list[ModelMessage]) -> None:
     """Print each tool call and its return value from the run's new messages."""
-    from pydantic_ai.messages import ToolCallPart, ToolReturnPart
-
-    calls = {}
     for message in messages:
-        for part in getattr(message, "parts", []):
-            if isinstance(part, ToolCallPart):
-                calls[part.tool_call_id] = part
-                print(f"  [tool call] {part.tool_name}({part.args})")
+        if isinstance(message, ModelResponse):
+            for part in message.parts:
+                if isinstance(part, ToolCallPart):
+                    print(f"  [tool call] {part.tool_name}({part.args})")
     for message in messages:
-        for part in getattr(message, "parts", []):
-            if isinstance(part, ToolReturnPart):
-                preview = str(part.content)
-                if len(preview) > 300:
-                    preview = preview[:300] + "..."
-                print(f"  [tool result] {part.tool_name}: {preview}")
+        if isinstance(message, ModelRequest):
+            for part in message.parts:
+                if isinstance(part, ToolReturnPart):
+                    print(f"  [tool result] {part.tool_name}: {_preview(part.content)}")
 
 
-async def ask(agent, question: str) -> None:
+async def ask(question: str) -> None:
     result = await agent.run(question)
     describe_tool_calls(result.new_messages())
     print(f"\nAgent: {result.output}\n")
@@ -86,8 +78,7 @@ async def ask(agent, question: str) -> None:
 
 async def main() -> None:
     check_environment()
-    agent = load_agent()
-    list_configured_tools(agent)
+    list_configured_tools()
     print("\nType a question. Type 'exit' to quit.\n")
 
     while True:
@@ -102,7 +93,7 @@ async def main() -> None:
             print("Bye.")
             break
         try:
-            await ask(agent, question)
+            await ask(question)
         except KeyboardInterrupt:
             print("\nRequest interrupted.")
         except Exception as exc:
