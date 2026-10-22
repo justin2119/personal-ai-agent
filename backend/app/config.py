@@ -8,6 +8,7 @@ load_dotenv()
 class Settings:
     RODIUM_API_KEY: str = os.getenv("RODIUM_API_KEY", "")
     RODIUM_BASE_URL: str = os.getenv("RODIUM_BASE_URL", "https://api.rodiumai.io/v1")
+    RODIUM_MODEL: str = os.getenv("RODIUM_MODEL") or os.getenv("MODEL_NAME") or "gpt-4o-mini"
     TAVILY_API_KEY: str = os.getenv("TAVILY_API_KEY", "")
     WEATHER_API_KEY: str = os.getenv("WEATHER_API_KEY", "")
     NOTION_API_KEY: str = os.getenv("NOTION_API_KEY", "")
