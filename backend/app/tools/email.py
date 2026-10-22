@@ -1,8 +1,11 @@
+import logging
 import smtplib
 import ssl
 from email.message import EmailMessage
 
 from app.config import settings
+
+logger = logging.getLogger(__name__)
 
 PREVIEW_CHARS = 300
 SMTP_TIMEOUT = 30
@@ -40,6 +43,7 @@ def send_email(to: str, subject: str, body: str, confirmed: bool = False) -> str
     If confirmed is False, nothing is sent. The function returns a summary
     (recipient, subject, body preview) that must be shown to the user, who must
     explicitly approve it. Only call again with confirmed=True after that approval.
+    Errors are returned as a string, never raised.
     """
     if not confirmed:
         preview = body if len(body) <= PREVIEW_CHARS else body[:PREVIEW_CHARS] + "..."
@@ -51,6 +55,12 @@ def send_email(to: str, subject: str, body: str, confirmed: bool = False) -> str
             "Ask the user for explicit confirmation. Call send_email again with confirmed=True only if they approve."
         )
 
-    msg = _build_message(to, subject, body)
-    _send_via_smtp(msg)
+    try:
+        msg = _build_message(to, subject, body)
+        _send_via_smtp(msg)
+    except RuntimeError as exc:
+        return f"Erreur email : {exc} L'email n'a pas été envoyé."
+    except Exception as exc:
+        logger.exception("SMTP send failed")
+        return f"Erreur email : l'envoi a échoué ({type(exc).__name__}). L'email n'a pas été envoyé."
     return f"Email sent to {to} with subject '{subject}'."
