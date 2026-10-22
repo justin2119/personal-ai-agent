@@ -47,6 +47,23 @@
     chat.scrollTop = chat.scrollHeight;
   }
 
+  /* ---------- Icons (Lucide) ---------- */
+
+  // Creates a placeholder <i data-lucide="name"> that Lucide replaces with an inline SVG.
+  function makeIcon(name) {
+    var icon = document.createElement("i");
+    icon.setAttribute("data-lucide", name);
+    icon.setAttribute("aria-hidden", "true");
+    return icon;
+  }
+
+  // Replaces all pending <i data-lucide> placeholders with SVG icons.
+  function refreshIcons() {
+    if (window.lucide && typeof window.lucide.createIcons === "function") {
+      window.lucide.createIcons();
+    }
+  }
+
   /* ---------- Storage ---------- */
 
   function loadSessions() {
@@ -137,9 +154,13 @@
     var bubble = document.createElement("div");
     bubble.className = "message " + role;
 
+    var iconName = role === "user" ? "user" : role === "error" ? "circle-alert" : "bot";
+    var labelText = role === "user" ? "Vous" : role === "error" ? "Erreur" : "Agent";
+
     var label = document.createElement("span");
     label.className = "message-label";
-    label.textContent = role === "user" ? "Vous" : role === "error" ? "Erreur" : "Agent";
+    label.appendChild(makeIcon(iconName));
+    label.appendChild(document.createTextNode(labelText));
 
     var body = document.createElement("div");
     body.className = "message-body";
@@ -158,7 +179,8 @@
 
     var label = document.createElement("span");
     label.className = "message-label";
-    label.textContent = "Agent";
+    label.appendChild(makeIcon("bot"));
+    label.appendChild(document.createTextNode("Agent"));
 
     var row = document.createElement("div");
     row.className = "thinking";
@@ -171,7 +193,8 @@
 
     var badge = document.createElement("span");
     badge.className = "tool-badge";
-    badge.textContent = "Réflexion et outils en cours";
+    badge.appendChild(makeIcon("sparkles"));
+    badge.appendChild(document.createTextNode("Réflexion et outils en cours"));
 
     row.appendChild(dots);
     row.appendChild(badge);
@@ -185,11 +208,13 @@
     var session = findSession(activeId);
     if (!session || session.messages.length === 0) {
       chat.appendChild(emptyTemplate.cloneNode(true));
+      refreshIcons();
       return;
     }
     session.messages.forEach(function (m) {
       chat.appendChild(buildMessage(m.role, m.text));
     });
+    refreshIcons();
     scrollToBottom();
   }
 
@@ -235,7 +260,7 @@
       renameButton.className = "session-action";
       renameButton.title = "Renommer";
       renameButton.setAttribute("aria-label", "Renommer la discussion");
-      renameButton.textContent = "\u270E";
+      renameButton.appendChild(makeIcon("pencil"));
       renameButton.addEventListener("click", function (event) {
         event.stopPropagation();
         renameSession(session.id);
@@ -246,7 +271,7 @@
       deleteButton.className = "session-action session-delete";
       deleteButton.title = "Supprimer";
       deleteButton.setAttribute("aria-label", "Supprimer la discussion");
-      deleteButton.textContent = "\u00D7";
+      deleteButton.appendChild(makeIcon("trash-2"));
       deleteButton.addEventListener("click", function (event) {
         event.stopPropagation();
         deleteSession(session.id);
@@ -258,6 +283,7 @@
       item.appendChild(actions);
       sessionList.appendChild(item);
     });
+    refreshIcons();
   }
 
   function setSidebarOpen(open) {
@@ -349,6 +375,7 @@
 
     if (sessionId === activeId) {
       chat.appendChild(buildMessage(role, text));
+      refreshIcons();
       scrollToBottom();
     }
   }
@@ -379,6 +406,7 @@
     renderSidebar();
     var placeholder = buildThinking();
     chat.appendChild(placeholder);
+    refreshIcons();
     scrollToBottom();
 
     setBusy(true);
@@ -487,6 +515,7 @@
     saveSessions();
     renderChat();
     renderSidebar();
+    refreshIcons();
   }
 
   // Initialise the settings field with the effective URL.
